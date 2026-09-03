@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<!-- ================= Security-Header (soweit auf GitHub Pages per <meta> moeglich) =================
+     GitHub Pages unterstuetzt KEINE echten HTTP-Response-Header (kein Server, keine
+     Konfigurationsebene). X-Frame-Options und X-Content-Type-Options lassen sich technisch
+     NUR als echter Header setzen -- ueber <meta> haben sie keinerlei Wirkung und werden hier
+     deshalb bewusst NICHT vorgetaeuscht. Die Content-Security-Policy unten funktioniert
+     teilweise per <meta> (frame-ancestors ausgenommen, siehe Kommentar unten). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+<title>Impressum – Zukunftspreis Stralsund</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root{
+    --accent:#0070bf;
+    --accent-dark:#00568f;
+    --accent-tint:#e7f2fa;
+    --ink:#0d1117;
+    --body:#3d4148;
+    --paper:#ffffff;
+    --gray-bg:#f4f5f7;
+    --line:#e2e5ea;
+    --footer-bg:#04182e;
+    --footer-text:#aeb8c6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',Arial,sans-serif;
+    color:var(--body);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  img{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 40px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;color:var(--accent);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 26px;
+    font-size:14px;font-weight:600;
+    border-radius:3px;border:1.5px solid transparent;
+    cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-outline-dark{background:transparent;color:var(--ink);border-color:var(--ink);}
+  .btn-outline-dark:hover{background:var(--ink);color:#fff;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:76px;}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;color:var(--ink);}
+  .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:6px;flex:none;}
+  .nav-right{display:flex;align-items:center;gap:22px;}
+  .burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+  .burger span{width:22px;height:2px;background:var(--ink);display:block;transition:transform .2s ease,opacity .2s ease;}
+  .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
+  .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+  /* ---------- Menu Panel ---------- */
+  .menu-backdrop{
+    position:fixed;inset:0;background:rgba(4,24,46,.55);
+    opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;z-index:90;
+  }
+  .menu-backdrop.open{opacity:1;visibility:visible;}
+  .menu-panel{
+    position:fixed;top:0;right:0;height:100%;width:340px;max-width:86vw;
+    background:#fff;z-index:95;box-shadow:-10px 0 32px rgba(0,0,0,.14);
+    transform:translateX(100%);transition:transform .3s ease;
+    padding:30px 30px 40px;display:flex;flex-direction:column;
+  }
+  .menu-panel.open{transform:translateX(0);}
+  .menu-panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px;}
+  .menu-panel-brand{font-weight:800;font-size:15px;color:var(--ink);}
+  .menu-close{background:none;border:none;font-size:26px;line-height:1;cursor:pointer;color:var(--ink);padding:4px 8px;}
+  .menu-close:focus-visible,.burger:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+  .menu-links{list-style:none;display:flex;flex-direction:column;}
+  .menu-links a{
+    display:block;padding:18px 2px;font-size:21px;font-weight:700;color:var(--ink);
+    border-bottom:1px solid var(--line);transition:color .15s ease;
+  }
+  .menu-links a:hover{color:var(--accent);}
+  .menu-panel-foot{margin-top:auto;padding-top:24px;font-size:13px;color:#8a8f99;}
+
+  /* ---------- Page header ---------- */
+  .page-head{background:var(--gray-bg);padding:64px 0 44px;border-bottom:1px solid var(--line);}
+  .page-head h1{font-size:clamp(28px,3.6vw,40px);font-weight:800;color:var(--ink);letter-spacing:-.01em;margin-top:10px;}
+  .page-head p{font-size:15px;line-height:1.6;color:var(--body);max-width:560px;margin-top:14px;}
+
+  /* ---------- Form ---------- */
+  .form-section{padding:64px 0 100px;}
+  .form-card{max-width:760px;margin:0 auto;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;}
+  .field{display:flex;flex-direction:column;gap:7px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:13px;font-weight:600;color:var(--ink);}
+  .field label .req{color:var(--accent);}
+  .field label .opt{color:#8a8f99;font-weight:500;font-size:12px;}
+  .field input,.field select{
+    font-family:inherit;font-size:15px;color:var(--ink);
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:4px;background:#fff;
+    transition:border-color .15s ease;
+  }
+  .field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
+  .field input:invalid:not(:placeholder-shown){border-color:#c94b4b;}
+  .checkbox-field{display:flex;align-items:flex-start;gap:10px;margin-top:6px;}
+  .checkbox-field input{width:18px;height:18px;flex:none;margin-top:2px;accent-color:var(--accent);}
+  .checkbox-field label{font-size:13.5px;line-height:1.55;color:var(--body);}
+  .checkbox-field a{color:var(--accent);font-weight:600;}
+  .form-note{font-size:12.5px;color:#8a8f99;margin-top:2px;}
+  .form-actions{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .form-required-hint{font-size:12.5px;color:#8a8f99;margin-top:28px;}
+
+  .success-box{
+    max-width:760px;margin:0 auto;text-align:center;padding:60px 20px;
+    border:1px solid var(--line);border-radius:6px;background:var(--gray-bg);display:none;
+  }
+  .success-box.show{display:block;}
+  .form-card.hide{display:none;}
+  .success-box .ic-ok{
+    width:56px;height:56px;border-radius:50%;background:var(--accent-tint);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+  }
+  .success-box h2{font-size:22px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+  .success-box p{font-size:14.5px;color:var(--body);max-width:420px;margin:0 auto;}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--footer-bg);color:var(--footer-text);padding:76px 0 26px;}
+  .footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:40px;padding-bottom:52px;}
+  footer .brand{color:#fff;margin-bottom:16px;}
+  .footer-desc{font-size:14px;line-height:1.7;max-width:320px;color:#8fa0b8;}
+  .footer-heading{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#fff;font-weight:700;margin-bottom:18px;}
+  .footer-links{list-style:none;display:flex;flex-direction:column;gap:12px;}
+  .footer-links a{font-size:14px;color:#aeb8c6;transition:color .15s ease;}
+  .footer-links a:hover{color:#fff;}
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,.12);padding-top:24px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-size:13px;color:#728098;
+  }
+
+  @media (max-width:900px){
+    .footer-grid{grid-template-columns:1fr;gap:34px;}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 22px;}
+    .nav{height:66px;}
+    .nav-right .btn-primary{display:none;}
+    .page-head{padding:44px 0 32px;}
+    .form-section{padding:44px 0 64px;}
+    .form-grid{grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+
+  /* ================= Barrierefreiheit: Zustände ================= */
+
+  /* --- Starker Kontrast: deckt alle Bereiche der Seite ab --- */
+  html.a11y-contrast{--ink:#fff;--body:#f0f0f0;--line:#555;--gray-bg:#111;--paper:#000;--accent:#ffd400;--accent-dark:#ffe45c;--accent-tint:#332b00;}
+  html.a11y-contrast body{background:#000 !important;color:#fff !important;}
+  html.a11y-contrast header{background:#000 !important;border-color:#555 !important;}
+  html.a11y-contrast .menu-panel{background:#000 !important;}
+  html.a11y-contrast .menu-panel-brand,
+  html.a11y-contrast .menu-panel-foot{border-color:#555 !important;}
+  html.a11y-contrast .hero-bg{filter:brightness(.5) grayscale(.3);}
+  html.a11y-contrast .details-card,
+  html.a11y-contrast .form-card,
+  html.a11y-contrast .success-box,
+  html.a11y-contrast .fact{background:#000 !important;border-color:#555 !important;}
+  html.a11y-contrast .fact-label,
+  html.a11y-contrast .fact-sub,
+  html.a11y-contrast .opt{color:#d4d8de !important;}
+  html.a11y-contrast .fact-value,
+  html.a11y-contrast h1,html.a11y-contrast h2,html.a11y-contrast h3{color:#fff !important;}
+  html.a11y-contrast .field input,
+  html.a11y-contrast .field select,
+  html.a11y-contrast .field textarea{background:#000 !important;color:#fff !important;border-color:#666 !important;}
+  html.a11y-contrast .btn-outline-dark{background:transparent !important;color:#fff !important;border-color:#777 !important;}
+  html.a11y-contrast .btn-outline-dark:hover{border-color:#fff !important;}
+  html.a11y-contrast .btn-outline-light{color:#fff !important;border-color:#888 !important;}
+  html.a11y-contrast .btn-primary{background:var(--accent) !important;color:#000 !important;}
+  html.a11y-contrast footer{background:#000 !important;border-color:#555 !important;}
+  html.a11y-contrast .footer-desc,
+  html.a11y-contrast .footer-heading{color:#d4d8de !important;}
+  html.a11y-contrast .footer-links a{color:#fff !important;}
+  html.a11y-contrast .legal-content p,
+  html.a11y-contrast .legal-content li,
+  html.a11y-contrast .legal-updated{color:#e4e7eb !important;}
+  html.a11y-contrast .legal-note{background:#332b00 !important;color:#ffe45c !important;}
+  html.a11y-contrast a{color:var(--accent) !important;}
+  html.a11y-contrast .eyebrow{color:var(--accent) !important;}
+
+  /* Das Barrierefreiheits-Panel selbst bleibt UNABHAENGIG vom Kontrastmodus
+     immer im normalen, hellen Stil mit schwarzem Text -- sonst wuerde es
+     sich durch die Variablen-Umdefinition selbst unlesbar machen. */
+  html.a11y-contrast .a11y-panel{background:#fff !important;border-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-panel h2,
+  html.a11y-contrast .a11y-panel .a11y-sub,
+  html.a11y-contrast .a11y-panel .a11y-row span,
+  html.a11y-contrast .a11y-btnrow button,
+  html.a11y-contrast .a11y-switch,
+  html.a11y-contrast .a11y-reset,
+  html.a11y-contrast .a11y-close{color:#0d1117 !important;}
+  html.a11y-contrast .a11y-panel .a11y-sub{color:#8a8f99 !important;}
+  html.a11y-contrast .a11y-row{border-top-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-btnrow button,
+  html.a11y-contrast .a11y-switch{background:#fff !important;border-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-reset{background:#f4f5f7 !important;border-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-switch[aria-pressed="true"]{
+    background:#0070bf !important;border-color:#0070bf !important;color:#fff !important;
+  }
+
+  html.a11y-underline a{text-decoration:underline !important;}
+  html.a11y-bigcursor,html.a11y-bigcursor *{cursor:pointer !important;}
+
+  /* --- Schriftgroesse: echtes Zoom statt nur body font-size, damit
+     WIRKLICH alles mitwaechst, nicht nur Text mit relativen Einheiten. --- */
+  html.a11y-fs-1{zoom:1.15;}
+  html.a11y-fs-2{zoom:1.3;}
+  html.a11y-fs-3{zoom:1.45;}
+  @supports not (zoom: 1){
+    html.a11y-fs-1{transform:scale(1.15);transform-origin:top left;width:86.9%;}
+    html.a11y-fs-2{transform:scale(1.3);transform-origin:top left;width:76.9%;}
+    html.a11y-fs-3{transform:scale(1.45);transform-origin:top left;width:69%;}
+  }
+
+  html.a11y-calm *,html.a11y-calm *::before,html.a11y-calm *::after{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
+  html.a11y-readable body{line-height:1.9 !important;letter-spacing:.01em !important;}
+  html.a11y-readable p{max-width:70ch;}
+
+  /* ================= Barrierefreiheits-Widget ================= */
+  .a11y-toggle{
+    position:fixed;right:20px;bottom:20px;z-index:220;
+    width:52px;height:52px;border-radius:50%;
+    background:var(--accent,#0070bf);color:#fff;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(181,21,43,.35);
+    transition:transform .15s ease,background .15s ease;
+  }
+  .a11y-toggle:hover{background:var(--accent-dark,#00568f);transform:translateY(-2px);}
+  .a11y-toggle:focus-visible{outline:2px solid var(--ink,#0d1117);outline-offset:3px;}
+  .a11y-toggle img{width:24px;height:auto;display:block;}
+
+  .a11y-panel{
+    position:fixed;right:20px;bottom:82px;z-index:220;
+    width:300px;max-width:calc(100vw - 40px);max-height:calc(100vh - 120px);overflow-y:auto;
+    background:#fff;border:1px solid var(--line,#e2e5ea);border-radius:10px;
+    box-shadow:0 16px 40px rgba(0,0,0,.18);
+    padding:20px;display:none;
+  }
+  .a11y-panel.open{display:block;}
+  .a11y-panel h2{font-size:14px;font-weight:800;color:var(--ink,#0d1117);margin-bottom:4px;}
+  .a11y-panel .a11y-sub{font-size:12px;color:#8a8f99;margin-bottom:14px;}
+  .a11y-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line,#e2e5ea);}
+  .a11y-row:first-of-type{border-top:none;}
+  .a11y-row span{font-size:13px;font-weight:600;color:var(--ink,#0d1117);}
+  .a11y-btnrow{display:flex;gap:6px;}
+  .a11y-btnrow button, .a11y-switch{
+    font-family:inherit;font-size:12px;font-weight:700;
+    border:1.5px solid var(--line,#e2e5ea);background:#fff;color:var(--ink,#0d1117);
+    border-radius:5px;padding:6px 10px;cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .a11y-btnrow button:hover,.a11y-switch:hover{border-color:var(--accent,#0070bf);}
+  .a11y-switch[aria-pressed="true"]{background:var(--accent,#0070bf);border-color:var(--accent,#0070bf);color:#fff;}
+  .a11y-reset{margin-top:14px;width:100%;font-family:inherit;font-size:12.5px;font-weight:700;padding:9px;border-radius:5px;border:1.5px solid var(--line,#e2e5ea);background:var(--gray-bg,#f4f5f7);color:var(--ink,#0d1117);cursor:pointer;}
+  .a11y-reset:hover{border-color:var(--accent,#0070bf);}
+  .a11y-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;line-height:1;cursor:pointer;color:#8a8f99;padding:4px;}
+
+  /* ================= Cookie-Banner ================= */
+  .cookie-banner{
+    position:fixed;left:0;right:0;bottom:0;z-index:230;
+    background:var(--ink,#0d1117);color:#fff;
+    padding:20px 24px;
+    display:none;
+    box-shadow:0 -8px 24px rgba(0,0,0,.18);
+  }
+  .cookie-banner.show{display:block;}
+  .cookie-inner{
+    max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;
+  }
+  .cookie-text{font-size:13.5px;line-height:1.6;color:#c7cdd6;max-width:640px;flex:1;min-width:240px;}
+  .cookie-text a{color:#fff;text-decoration:underline;font-weight:600;}
+  .cookie-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .cookie-actions button{
+    font-family:inherit;font-size:13px;font-weight:700;padding:11px 18px;border-radius:4px;cursor:pointer;
+    border:2px solid transparent;transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .cookie-accept{background:var(--accent,#0070bf);color:#fff;border-color:var(--accent,#0070bf);}
+  .cookie-accept:hover{background:var(--accent-dark,#00568f);border-color:var(--accent-dark,#00568f);}
+  .cookie-necessary{background:transparent;color:#fff;border-color:#ffffff;}
+  .cookie-necessary:hover{background:rgba(255,255,255,.12);}
+
+  @media (max-width:640px){
+    .a11y-panel{right:12px;left:12px;width:auto;bottom:78px;}
+    .a11y-toggle{right:14px;bottom:14px;}
+    .cookie-banner{padding:18px 16px;}
+  }
+
+
+
+  /* ---------- Legal content ---------- */
+  .legal-section{padding:64px 0 100px;}
+  .legal-content{max-width:760px;}
+  .legal-content h2{font-size:15px;font-weight:800;color:var(--ink);margin:34px 0 10px;}
+  .legal-content h2:first-of-type{margin-top:8px;}
+  .legal-content h3{font-size:13.5px;font-weight:700;color:var(--ink);margin:18px 0 6px;}
+  .legal-content p{font-size:14px;line-height:1.75;color:var(--body);margin-bottom:10px;}
+  .legal-content ul{font-size:14px;line-height:1.85;color:var(--body);margin:6px 0 16px 20px;}
+  .legal-content li{margin-bottom:4px;}
+  .legal-content a{color:var(--accent);font-weight:600;}
+  .legal-note{
+    font-size:13px;line-height:1.65;color:var(--accent-dark);background:var(--accent-tint);
+    border-radius:6px;padding:14px 16px;margin:0 0 30px;
+  }
+  .legal-updated{font-size:12.5px;color:#8a8f99;margin-top:44px;padding-top:16px;border-top:1px solid var(--line);}
+
+</style>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="brand">
+      <span class="mark"></span>
+      Zukunftspreis Stralsund
+    </a>
+    <div class="nav-right">
+      <a href="teilnehmen.html" class="btn btn-primary">Jetzt bewerben</a>
+      <button class="burger" id="burgerBtn" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="menu-backdrop" id="menuBackdrop"></div>
+<nav class="menu-panel" id="mobileMenu" aria-label="Hauptmenü">
+  <div class="menu-panel-top">
+    <span class="menu-panel-brand">Menü</span>
+    <button class="menu-close" id="menuCloseBtn" aria-label="Menü schließen">&times;</button>
+  </div>
+  <ul class="menu-links">
+    <li><a href="teilnehmen.html">Bewerben</a></li>
+    <li><a href="details.html">Details</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <div class="menu-panel-foot">Zukunftspreis Stralsund · 10. August – 16. Oktober 2026</div>
+</nav>
+
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">Rechtliches</span>
+    <h1>Impressum</h1>
+    <p>Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG) für die Website des Zukunftspreises Stralsund.</p>
+  </div>
+</section>
+
+<section class="legal-section">
+  <div class="wrap">
+    <div class="legal-content">
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <p>
+        Stralsunder Innovations- und Gründerzentrum GmbH<br>
+        vertreten durch den Geschäftsführer Peter Fürst
+      </p>
+
+      <h3>Anschrift</h3>
+      <p>
+        Stralsunder Innovations- und Gründerzentrum GmbH<br>
+        Heinrich-Mann-Straße 11<br>
+        D-18435 Stralsund
+      </p>
+
+      <h3>Projektstandort</h3>
+      <p>
+        MakerPort Stralsund<br>
+        Wasserstraße 68<br>
+        D-18439 Stralsund
+      </p>
+
+      <h3>Registereintrag</h3>
+      <p>
+        Registergericht: Amtsgericht Stralsund<br>
+        Registernummer: HRB 4079<br>
+        USt-IdNr.: DE186842546
+      </p>
+
+      <h3>Kontakt</h3>
+      <p>
+        E-Mail: <a href="mailto:zukunftspreis@makerport.de">zukunftspreis@makerport.de</a><br>
+        Internet: <a href="https://www.makerport.de" target="_blank" rel="noopener">www.makerport.de</a>
+      </p>
+
+      <h2>Auftraggeber dieser Website</h2>
+      <p>
+        Diese Website und die dazugehörige Bewerbungsverwaltung für den „Zukunftspreis Stralsund"
+        werden vom Stralsunder Innovations- und Gründerzentrum GmbH (MakerPort Stralsund) im
+        Auftrag der Hansestadt Stralsund, der Hochschule Stralsund sowie im Rahmen der
+        gemeinsamen Organisation des Zukunftspreises konzipiert, technisch umgesetzt und
+        betrieben. MakerPort Stralsund, die Hochschule Stralsund und die Hansestadt Stralsund
+        haben im Rahmen der gemeinsamen Organisation des Wettbewerbs Zugriff auf die im
+        Zusammenhang mit dieser Website erhobenen Bewerbungs- und Kontaktdaten. Weitere
+        Einzelheiten zur Datenverarbeitung finden Sie in unserer
+        <a href="datenschutz.html">Datenschutzerklärung</a>.
+      </p>
+
+      <h2>Verantwortlich für den redaktionellen Inhalt</h2>
+      <p>
+        Peter Fürst<br>
+        Heinrich-Mann-Straße 11<br>
+        D-18435 Stralsund
+      </p>
+
+      <h2>Technische Umsetzung</h2>
+      <p>
+        Stralsunder Innovations- und Gründerzentrum GmbH, Heinrich-Mann-Straße 11, D-18435 Stralsund.
+        Die Website wird als statische Seite über GitHub Pages ausgeliefert, Bewerbungs- und
+        Kontaktdaten werden über Supabase (Datenbank-Hosting in der EU) verarbeitet.
+      </p>
+
+      <h2>Streitbeilegung</h2>
+      <p>
+        Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
+        Verbraucherschlichtungsstelle teilzunehmen.
+      </p>
+
+      <h2>Haftung für Inhalte</h2>
+      <p>
+        Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten
+        nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als
+        Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
+        Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige
+        Tätigkeit hinweisen.
+      </p>
+      <p>
+        Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den
+        allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch
+        erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei
+        Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend
+        entfernen.
+      </p>
+
+      <h2>Haftung für Links</h2>
+      <p>
+        Unser Angebot enthält gegebenenfalls Links zu externen Websites Dritter, auf deren
+        Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch
+        keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige
+        Anbieter oder Betreiber der Seiten verantwortlich. Eine permanente inhaltliche Kontrolle
+        der verlinkten Seiten ist ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht
+        zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend
+        entfernen.
+      </p>
+
+      <h2>Urheberrecht</h2>
+      <p>
+        Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen
+        dem deutschen Urheberrecht. Vervielfältigung, Bearbeitung, Verbreitung und jede Art der
+        Verwertung außerhalb der Grenzen des Urheberrechts bedürfen der schriftlichen Zustimmung
+        des jeweiligen Erstellers. Soweit die Inhalte auf dieser Seite nicht vom Betreiber
+        erstellt wurden, werden die Urheberrechte Dritter beachtet. Sollten Sie trotzdem auf eine
+        Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis.
+      </p>
+
+      <p class="legal-updated">Stand: 2. September 2026</p>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="brand"><span class="mark"></span>Zukunftspreis Stralsund</div>
+        <p class="footer-desc">Der Zukunftspreis Stralsund 2026 wird organisiert vom MakerPort Stralsund, der Hochschule Stralsund und der Hansestadt Stralsund.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Navigation</div>
+        <ul class="footer-links"><li><a href="teilnehmen.html">Bewerben</a></li><li><a href="details.html">Details</a></li></ul>
+      </div>
+      <div>
+        <div class="footer-heading">Rechtliches</div>
+        <ul class="footer-links"><li><a href="impressum.html">Impressum</a></li><li><a href="datenschutz.html">Datenschutzerklärung</a></li><li><a href="kontakt.html">Kontakt</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Zukunftspreis Stralsund. Alle Rechte vorbehalten.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var burger = document.getElementById('burgerBtn');
+    var closeBtn = document.getElementById('menuCloseBtn');
+    var panel = document.getElementById('mobileMenu');
+    var backdrop = document.getElementById('menuBackdrop');
+
+    function openMenu(){
+      panel.classList.add('open');
+      backdrop.classList.add('open');
+      burger.setAttribute('aria-expanded','true');
+      document.body.style.overflow='hidden';
+      closeBtn.focus();
+    }
+    function closeMenu(){
+      panel.classList.remove('open');
+      backdrop.classList.remove('open');
+      burger.setAttribute('aria-expanded','false');
+      document.body.style.overflow='';
+      burger.focus();
+    }
+    burger.addEventListener('click', function(){
+      panel.classList.contains('open') ? closeMenu() : openMenu();
+    });
+    closeBtn.addEventListener('click', closeMenu);
+    backdrop.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && panel.classList.contains('open')) closeMenu();
+    });
+  })();
+</script>
+
+
+
+
+<!-- ===== Barrierefreiheits-Widget ===== -->
+<button class="a11y-toggle" id="a11yToggle" aria-label="Barrierefreiheits-Einstellungen öffnen" aria-expanded="false" aria-controls="a11yPanel">
+  <img src="data:image/png;base64,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" alt="" aria-hidden="true">
+</button>
+
+<div class="a11y-panel" id="a11yPanel" role="dialog" aria-modal="false" aria-labelledby="a11yPanelTitle">
+  <button class="a11y-close" id="a11yClose" aria-label="Einstellungen schließen">&times;</button>
+  <h2 id="a11yPanelTitle">Barrierefreiheit</h2>
+  <p class="a11y-sub">Einstellungen werden lokal in Ihrem Browser gespeichert.</p>
+
+  <div class="a11y-row">
+    <span>Schriftgröße</span>
+    <div class="a11y-btnrow">
+      <button type="button" id="a11yFontMinus" aria-label="Schrift verkleinern">A−</button>
+      <button type="button" id="a11yFontPlus" aria-label="Schrift vergrößern">A+</button>
+    </div>
+  </div>
+  <div class="a11y-row">
+    <span>Starker Kontrast</span>
+    <button type="button" class="a11y-switch" id="a11yContrast" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Links unterstreichen</span>
+    <button type="button" class="a11y-switch" id="a11yUnderline" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Lesefreundlicher Abstand</span>
+    <button type="button" class="a11y-switch" id="a11yReadable" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Animationen reduzieren</span>
+    <button type="button" class="a11y-switch" id="a11yCalm" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Großer Mauszeiger</span>
+    <button type="button" class="a11y-switch" id="a11yCursor" aria-pressed="false">An</button>
+  </div>
+
+  <button type="button" class="a11y-reset" id="a11yReset">Alle Einstellungen zurücksetzen</button>
+</div>
+
+<!-- ===== Cookie-Banner ===== -->
+<div class="cookie-banner" id="cookieBanner" role="region" aria-label="Cookie-Hinweis">
+  <div class="cookie-inner">
+    <p class="cookie-text">
+      Wir verwenden ausschließlich technisch notwendige Cookies bzw. lokale Speicherung
+      (u. a. für Ihre Cookie-Auswahl, Ihre Barrierefreiheits-Einstellungen sowie – im
+      passwortgeschützten Admin-Bereich – Ihre Anmeldesitzung). Es findet kein Tracking und
+      keine Analyse Ihres Verhaltens statt. Details in unserer
+      <a href="datenschutz.html">Datenschutzerklärung</a>.
+    </p>
+    <div class="cookie-actions">
+      <button type="button" class="cookie-necessary" id="cookieNecessary">Nur notwendige</button>
+      <button type="button" class="cookie-accept" id="cookieAccept">Verstanden</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  // ===== Barrierefreiheit =====
+  var root = document.documentElement;
+  var KEY = 'wfs_a11y';
+  var FS_KEY = 'wfs_a11y_fs';
+  var toggles = {
+    a11yContrast:'a11y-contrast',
+    a11yUnderline:'a11y-underline',
+    a11yReadable:'a11y-readable',
+    a11yCalm:'a11y-calm',
+    a11yCursor:'a11y-bigcursor'
+  };
+
+  function loadState(){
+    var raw;
+    try{ raw = JSON.parse(localStorage.getItem(KEY) || '{}'); }catch(e){ raw = {}; }
+    Object.keys(toggles).forEach(function(id){
+      var cls = toggles[id];
+      var on = !!raw[id];
+      root.classList.toggle(cls, on);
+      var btn = document.getElementById(id);
+      if(btn) btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var fs = parseInt(localStorage.getItem(FS_KEY) || '0', 10) || 0;
+    applyFontSize(fs);
+  }
+
+  function saveState(){
+    var raw = {};
+    Object.keys(toggles).forEach(function(id){
+      raw[id] = root.classList.contains(toggles[id]);
+    });
+    localStorage.setItem(KEY, JSON.stringify(raw));
+  }
+
+  function applyFontSize(step){
+    step = Math.max(0, Math.min(3, step));
+    for(var i=1;i<=3;i++){ root.classList.remove('a11y-fs-'+i); }
+    if(step > 0) root.classList.add('a11y-fs-'+step);
+    localStorage.setItem(FS_KEY, String(step));
+  }
+
+  loadState();
+
+  var panel = document.getElementById('a11yPanel');
+  var toggleBtn = document.getElementById('a11yToggle');
+  var closeBtn = document.getElementById('a11yClose');
+
+  function openPanel(){
+    panel.classList.add('open');
+    toggleBtn.setAttribute('aria-expanded','true');
+  }
+  function closePanel(){
+    panel.classList.remove('open');
+    toggleBtn.setAttribute('aria-expanded','false');
+  }
+  if(toggleBtn){
+    toggleBtn.addEventListener('click', function(){
+      panel.classList.contains('open') ? closePanel() : openPanel();
+    });
+  }
+  if(closeBtn) closeBtn.addEventListener('click', closePanel);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closePanel();
+  });
+  document.addEventListener('click', function(e){
+    if(panel && panel.classList.contains('open') && !panel.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)){
+      closePanel();
+    }
+  });
+
+  Object.keys(toggles).forEach(function(id){
+    var btn = document.getElementById(id);
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      var cls = toggles[id];
+      var on = !root.classList.contains(cls);
+      root.classList.toggle(cls, on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      saveState();
+    });
+  });
+
+  var fsMinus = document.getElementById('a11yFontMinus');
+  var fsPlus = document.getElementById('a11yFontPlus');
+  if(fsMinus) fsMinus.addEventListener('click', function(){
+    var cur = parseInt(localStorage.getItem(FS_KEY) || '0', 10) || 0;
+    applyFontSize(cur - 1);
+  });
+  if(fsPlus) fsPlus.addEventListener('click', function(){
+    var cur = parseInt(localStorage.getItem(FS_KEY) || '0', 10) || 0;
+    applyFontSize(cur + 1);
+  });
+
+  var resetBtn = document.getElementById('a11yReset');
+  if(resetBtn) resetBtn.addEventListener('click', function(){
+    Object.keys(toggles).forEach(function(id){
+      root.classList.remove(toggles[id]);
+      var btn = document.getElementById(id);
+      if(btn) btn.setAttribute('aria-pressed','false');
+    });
+    applyFontSize(0);
+    saveState();
+  });
+
+  // ===== Cookie-Banner =====
+  var CK = 'wfs_cookie_choice';
+  var banner = document.getElementById('cookieBanner');
+  var accept = document.getElementById('cookieAccept');
+  var necessary = document.getElementById('cookieNecessary');
+
+  function hasChoice(){
+    return !!localStorage.getItem(CK);
+  }
+  function setChoice(val){
+    localStorage.setItem(CK, val);
+    if(banner) banner.classList.remove('show');
+  }
+  if(banner && !hasChoice()){
+    banner.classList.add('show');
+  }
+  if(accept) accept.addEventListener('click', function(){ setChoice('all'); });
+  if(necessary) necessary.addEventListener('click', function(){ setChoice('necessary'); });
+})();
+</script>
+
+</body>
+</html>

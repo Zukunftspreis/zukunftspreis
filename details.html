@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= Security-Header (soweit auf GitHub Pages per <meta> moeglich) =================
+     GitHub Pages unterstuetzt KEINE echten HTTP-Response-Header (kein Server, keine
+     Konfigurationsebene). X-Frame-Options und X-Content-Type-Options lassen sich technisch
+     NUR als echter Header setzen -- ueber <meta> haben sie keinerlei Wirkung und werden hier
+     deshalb bewusst NICHT vorgetaeuscht. Die Content-Security-Policy unten funktioniert
+     teilweise per <meta> (frame-ancestors ausgenommen, siehe Kommentar unten). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none';">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+<title>Details – Zukunftspreis Stralsund</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root{
+    --accent:#0070bf;
+    --accent-dark:#00568f;
+    --accent-tint:#e7f2fa;
+    --ink:#0d1117;
+    --body:#3d4148;
+    --paper:#ffffff;
+    --gray-bg:#f4f5f7;
+    --line:#e2e5ea;
+    --footer-bg:#04182e;
+    --footer-text:#aeb8c6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',Arial,sans-serif;
+    color:var(--body);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  img{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 40px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;color:var(--accent);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 26px;
+    font-size:14px;font-weight:600;
+    border-radius:3px;border:1.5px solid transparent;
+    cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-outline-dark{background:transparent;color:var(--ink);border-color:var(--ink);}
+  .btn-outline-dark:hover{background:var(--ink);color:#fff;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:76px;}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;color:var(--ink);}
+  .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:6px;flex:none;}
+  .nav-right{display:flex;align-items:center;gap:22px;}
+  .burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+  .burger span{width:22px;height:2px;background:var(--ink);display:block;transition:transform .2s ease,opacity .2s ease;}
+  .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
+  .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+  /* ---------- Menu Panel ---------- */
+  .menu-backdrop{
+    position:fixed;inset:0;background:rgba(4,24,46,.55);
+    opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;z-index:90;
+  }
+  .menu-backdrop.open{opacity:1;visibility:visible;}
+  .menu-panel{
+    position:fixed;top:0;right:0;height:100%;width:340px;max-width:86vw;
+    background:#fff;z-index:95;box-shadow:-10px 0 32px rgba(0,0,0,.14);
+    transform:translateX(100%);transition:transform .3s ease;
+    padding:30px 30px 40px;display:flex;flex-direction:column;
+  }
+  .menu-panel.open{transform:translateX(0);}
+  .menu-panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px;}
+  .menu-panel-brand{font-weight:800;font-size:15px;color:var(--ink);}
+  .menu-close{background:none;border:none;font-size:26px;line-height:1;cursor:pointer;color:var(--ink);padding:4px 8px;}
+  .menu-close:focus-visible,.burger:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+  .menu-links{list-style:none;display:flex;flex-direction:column;}
+  .menu-links a{
+    display:block;padding:18px 2px;font-size:21px;font-weight:700;color:var(--ink);
+    border-bottom:1px solid var(--line);transition:color .15s ease;
+  }
+  .menu-links a:hover{color:var(--accent);}
+  .menu-panel-foot{margin-top:auto;padding-top:24px;font-size:13px;color:#8a8f99;}
+
+  /* ---------- Article head ---------- */
+  .article-head{background:var(--gray-bg);padding:64px 0 44px;border-bottom:1px solid var(--line);}
+  .article-meta{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:16px;}
+  .article-meta .dot{width:3px;height:3px;border-radius:50%;background:#8a8f99;flex:none;}
+  .article-head h1{font-size:clamp(26px,3.6vw,40px);font-weight:800;color:var(--ink);letter-spacing:-.01em;line-height:1.2;max-width:820px;}
+
+  /* ---------- Article body ---------- */
+  .article-section{padding:56px 0 100px;}
+  .article-body{max-width:700px;margin:0 auto;}
+  .article-body p{font-size:16px;line-height:1.8;color:var(--body);margin-bottom:22px;}
+  .article-body h2{font-size:clamp(20px,2.4vw,25px);font-weight:800;color:var(--ink);letter-spacing:-.01em;margin:46px 0 18px;}
+  .article-body h2:first-child{margin-top:0;}
+  .article-body a{color:var(--accent);font-weight:700;text-decoration:underline;text-decoration-color:rgba(0,112,191,.35);text-underline-offset:2px;transition:text-decoration-color .15s ease;}
+  .article-body a:hover{text-decoration-color:var(--accent);}
+  .list-label{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:12px;}
+  .article-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin:0 0 26px;}
+  .article-list li{position:relative;padding-left:22px;font-size:16px;line-height:1.6;color:var(--body);}
+  .article-list li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  .article-callout{
+    border-left:3px solid var(--accent);background:var(--accent-tint);
+    padding:18px 24px;margin:30px 0;font-size:16.5px;font-weight:700;color:var(--ink);line-height:1.6;
+    border-radius:0 4px 4px 0;
+  }
+
+  .apply-box{
+    margin-top:52px;padding:36px;border:1px solid var(--line);border-radius:6px;background:var(--gray-bg);
+    display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  }
+  .apply-box-text strong{display:block;font-size:17px;color:var(--ink);margin-bottom:4px;}
+  .apply-box-text span{font-size:14px;color:var(--body);}
+  .apply-box .btn{text-decoration:none;}
+  .apply-box .btn-primary{color:#fff;}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--footer-bg);color:var(--footer-text);padding:76px 0 26px;}
+  .footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:40px;padding-bottom:52px;}
+  footer .brand{color:#fff;margin-bottom:16px;}
+  .footer-desc{font-size:14px;line-height:1.7;max-width:320px;color:#8fa0b8;}
+  .footer-heading{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#fff;font-weight:700;margin-bottom:18px;}
+  .footer-links{list-style:none;display:flex;flex-direction:column;gap:12px;}
+  .footer-links a{font-size:14px;color:#aeb8c6;transition:color .15s ease;}
+  .footer-links a:hover{color:#fff;}
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,.12);padding-top:24px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-size:13px;color:#728098;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .footer-grid{grid-template-columns:1fr;gap:34px;}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 22px;}
+    .nav{height:66px;}
+    .nav-right .btn-primary{display:none;}
+    .article-head{padding:44px 0 32px;}
+    .article-section{padding:44px 0 64px;}
+    .apply-box{flex-direction:column;align-items:flex-start;padding:26px;}
+  }
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+
+  /* ================= Barrierefreiheit: Zustände ================= */
+  html.a11y-contrast{--ink:#fff;--body:#f0f0f0;--line:#555;--gray-bg:#111;--paper:#000;--accent:#ffd400;--accent-dark:#ffe45c;--accent-tint:#332b00;}
+  html.a11y-contrast body{background:#000 !important;color:#fff !important;}
+  html.a11y-contrast header{background:#000 !important;border-color:#555 !important;}
+  html.a11y-contrast .menu-panel{background:#000 !important;}
+  html.a11y-contrast .article-head{background:#000 !important;border-color:#555 !important;}
+  html.a11y-contrast .article-head h1{color:#fff !important;}
+  html.a11y-contrast .article-body h2{color:#fff !important;}
+  html.a11y-contrast .article-body p,
+  html.a11y-contrast .article-list li,
+  html.a11y-contrast .apply-box-text span{color:#e4e7eb !important;}
+  html.a11y-contrast .article-body a{color:var(--accent) !important;}
+  html.a11y-contrast .article-callout,
+  html.a11y-contrast .apply-box{background:#000 !important;border-color:#555 !important;color:#fff !important;}
+  html.a11y-contrast .apply-box-text strong{color:#fff !important;}
+  html.a11y-contrast .btn-primary{background:var(--accent) !important;color:#000 !important;}
+  html.a11y-contrast .btn-outline-dark{background:transparent !important;color:#fff !important;border-color:#777 !important;}
+  html.a11y-contrast footer{background:#000 !important;border-color:#555 !important;}
+  html.a11y-contrast .footer-desc,html.a11y-contrast .footer-heading{color:#d4d8de !important;}
+  html.a11y-contrast .footer-links a{color:#fff !important;}
+  html.a11y-contrast .eyebrow,html.a11y-contrast .article-meta{color:var(--accent) !important;}
+
+  html.a11y-contrast .a11y-panel{background:#fff !important;border-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-panel h2,
+  html.a11y-contrast .a11y-panel .a11y-sub,
+  html.a11y-contrast .a11y-panel .a11y-row span,
+  html.a11y-contrast .a11y-btnrow button,
+  html.a11y-contrast .a11y-switch,
+  html.a11y-contrast .a11y-reset,
+  html.a11y-contrast .a11y-close{color:#0d1117 !important;}
+  html.a11y-contrast .a11y-panel .a11y-sub{color:#8a8f99 !important;}
+  html.a11y-contrast .a11y-row{border-top-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-btnrow button,
+  html.a11y-contrast .a11y-switch{background:#fff !important;border-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-reset{background:#f4f5f7 !important;border-color:#e2e5ea !important;}
+  html.a11y-contrast .a11y-switch[aria-pressed="true"]{
+    background:#0070bf !important;border-color:#0070bf !important;color:#fff !important;
+  }
+
+  html.a11y-underline a{text-decoration:underline !important;}
+  html.a11y-bigcursor,html.a11y-bigcursor *{cursor:pointer !important;}
+
+  html.a11y-fs-1{zoom:1.15;}
+  html.a11y-fs-2{zoom:1.3;}
+  html.a11y-fs-3{zoom:1.45;}
+  @supports not (zoom: 1){
+    html.a11y-fs-1{transform:scale(1.15);transform-origin:top left;width:86.9%;}
+    html.a11y-fs-2{transform:scale(1.3);transform-origin:top left;width:76.9%;}
+    html.a11y-fs-3{transform:scale(1.45);transform-origin:top left;width:69%;}
+  }
+
+  html.a11y-calm *,html.a11y-calm *::before,html.a11y-calm *::after{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
+  html.a11y-readable body{line-height:1.9 !important;letter-spacing:.01em !important;}
+  html.a11y-readable p{max-width:70ch;}
+
+  /* ================= Barrierefreiheits-Widget ================= */
+  .a11y-toggle{
+    position:fixed;right:20px;bottom:20px;z-index:220;
+    width:52px;height:52px;border-radius:50%;
+    background:var(--ink,#0d1117);color:#fff;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(0,0,0,.25);
+    transition:transform .15s ease,background .15s ease;
+  }
+  .a11y-toggle:hover{background:var(--accent,#0070bf);transform:translateY(-2px);}
+  .a11y-toggle:focus-visible{outline:2px solid var(--accent,#0070bf);outline-offset:3px;}
+  .a11y-toggle svg{width:26px;height:26px;}
+
+  .a11y-panel{
+    position:fixed;right:20px;bottom:82px;z-index:220;
+    width:300px;max-width:calc(100vw - 40px);max-height:calc(100vh - 120px);overflow-y:auto;
+    background:#fff;border:1px solid var(--line,#e2e5ea);border-radius:10px;
+    box-shadow:0 16px 40px rgba(0,0,0,.18);
+    padding:20px;display:none;
+  }
+  .a11y-panel.open{display:block;}
+  .a11y-panel h2{font-size:14px;font-weight:800;color:var(--ink,#0d1117);margin-bottom:4px;}
+  .a11y-panel .a11y-sub{font-size:12px;color:#8a8f99;margin-bottom:14px;}
+  .a11y-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line,#e2e5ea);}
+  .a11y-row:first-of-type{border-top:none;}
+  .a11y-row span{font-size:13px;font-weight:600;color:var(--ink,#0d1117);}
+  .a11y-btnrow{display:flex;gap:6px;}
+  .a11y-btnrow button, .a11y-switch{
+    font-family:inherit;font-size:12px;font-weight:700;
+    border:1.5px solid var(--line,#e2e5ea);background:#fff;color:var(--ink,#0d1117);
+    border-radius:5px;padding:6px 10px;cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .a11y-btnrow button:hover,.a11y-switch:hover{border-color:var(--accent,#0070bf);}
+  .a11y-switch[aria-pressed="true"]{background:var(--accent,#0070bf);border-color:var(--accent,#0070bf);color:#fff;}
+  .a11y-reset{margin-top:14px;width:100%;font-family:inherit;font-size:12.5px;font-weight:700;padding:9px;border-radius:5px;border:1.5px solid var(--line,#e2e5ea);background:var(--gray-bg,#f4f5f7);color:var(--ink,#0d1117);cursor:pointer;}
+  .a11y-reset:hover{border-color:var(--accent,#0070bf);}
+  .a11y-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;line-height:1;cursor:pointer;color:#8a8f99;padding:4px;}
+
+  /* ================= Cookie-Banner ================= */
+  .cookie-banner{
+    position:fixed;left:0;right:0;bottom:0;z-index:230;
+    background:var(--ink,#0d1117);color:#fff;
+    padding:20px 24px;
+    display:none;
+    box-shadow:0 -8px 24px rgba(0,0,0,.18);
+  }
+  .cookie-banner.show{display:block;}
+  .cookie-inner{
+    max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;
+  }
+  .cookie-text{font-size:13.5px;line-height:1.6;color:#c7cdd6;max-width:640px;flex:1;min-width:240px;}
+  .cookie-text a{color:#fff;text-decoration:underline;font-weight:600;}
+  .cookie-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .cookie-actions button{
+    font-family:inherit;font-size:13px;font-weight:700;padding:11px 18px;border-radius:4px;cursor:pointer;
+    border:1.5px solid transparent;transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .cookie-accept{background:var(--accent,#0070bf);color:#fff;}
+  .cookie-accept:hover{background:var(--accent-dark,#00568f);}
+  .cookie-necessary{background:transparent;color:#fff;border-color:rgba(255,255,255,.35);}
+  .cookie-necessary:hover{border-color:#fff;}
+
+  @media (max-width:640px){
+    .a11y-panel{right:12px;left:12px;width:auto;bottom:78px;}
+    .a11y-toggle{right:14px;bottom:14px;}
+    .cookie-banner{padding:18px 16px;}
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="brand">
+      <span class="mark"></span>
+      Zukunftspreis Stralsund
+    </a>
+    <div class="nav-right">
+      <a href="teilnehmen.html" class="btn btn-primary">Jetzt bewerben</a>
+      <button class="burger" id="burgerBtn" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="menu-backdrop" id="menuBackdrop"></div>
+<nav class="menu-panel" id="mobileMenu" aria-label="Hauptmenü">
+  <div class="menu-panel-top">
+    <span class="menu-panel-brand">Menü</span>
+    <button class="menu-close" id="menuCloseBtn" aria-label="Menü schließen">&times;</button>
+  </div>
+  <ul class="menu-links">
+    <li><a href="teilnehmen.html">Bewerben</a></li>
+    <li><a href="details.html">Details</a></li>
+    <li><a href="kontakt.html">Kontakt</a></li>
+  </ul>
+  <div class="menu-panel-foot">Zukunftspreis Stralsund · 10. August – 16. Oktober 2026</div>
+</nav>
+
+<section class="article-head">
+  <div class="wrap">
+    <div class="article-meta">
+      <span>10. Aug.</span>
+      <span class="dot"></span>
+      <span>2 Min. Lesezeit</span>
+    </div>
+    <h1>Du machst Stralsund heute schon zukunftsfähiger? Dann zeig uns, was du bewegst.</h1>
+  </div>
+</section>
+
+<section class="article-section">
+  <div class="wrap">
+    <div class="article-body">
+
+      <p>Stralsund ist eine Stadt mit Geschichte und mit Menschen, Unternehmen und Initiativen, die ihre Zukunft aktiv gestalten. Der Stralsunder Zukunftspreis 2026 zeichnet konkrete Projekte, Konzepte und Beiträge aus, die bereits heute einen wichtigen Beitrag zur zukunftsfähigen Entwicklung unserer Stadt leisten.</p>
+
+      <p>Du setzt dich mit deinem Unternehmen, Verein, deiner Initiative oder als Privatperson bereits für einen nachhaltigen Tourismus in Stralsund ein? Du hast ein Konzept, das Gäste und Einheimische gleichermaßen mitdenkt und unsere Stadt langfristig stärkt?</p>
+
+      <p>Dann <a href="teilnehmen.html">bewirb dich jetzt</a> für den Stralsunder Zukunftspreis 2026. Es wartet ein Preisgeld von 2.000&nbsp;€ auf dich.</p>
+
+      <h2>Worum geht's beim Zukunftspreis?</h2>
+
+      <p>Der Stralsunder Zukunftspreis macht sichtbar, was in unserer Stadt bereits passiert. Gesucht und ausgezeichnet werden Menschen, Unternehmen, Vereine, Initiativen und Projekte, die sich heute schon mit den Herausforderungen einer zukunftsfähigen Stadtentwicklung auseinandersetzen und konkrete Lösungen umsetzen.</p>
+
+      <p>Dabei zählt nicht, wie groß ein Projekt ist. Entscheidend ist sein konkreter Beitrag zu einer nachhaltigen und zukunftsfähigen Entwicklung Stralsunds. Der Zukunftspreis wird von der Hochschule Stralsund, der Hansestadt Stralsund und dem MakerPort Stralsund getragen.</p>
+
+      <h2>Das Schwerpunktthema 2026: Nachhaltiger Tourismus</h2>
+
+      <p>Tourismus gehört zu Stralsund und prägt unsere Stadt. Gleichzeitig stellt sich die Frage, wie Tourismus heute und in Zukunft gestaltet werden kann, sodass Gäste gerne kommen und Stralsund auch für die Menschen, die hier leben, attraktiv und lebenswert bleibt. Genau hier setzt der Zukunftspreis 2026 an.</p>
+
+      <p>Gesucht werden bestehende Unternehmen, Projekte, Konzepte und Initiativen, die nachhaltigen Tourismus in Stralsund bereits heute leben und mitgestalten. Zum Beispiel durch Angebote, die regionale Wertschöpfung stärken und lokale Akteure einbeziehen, durch nachhaltige Mobilitäts- oder Übernachtungskonzepte oder durch neue Formen des Tourismus, die Natur, Kultur, Wirtschaft und Lebensqualität miteinander verbinden.</p>
+
+      <p>Auch Beiträge, die sich mit den Auswirkungen von Kreuzfahrt- und Tagestourismus auseinandersetzen oder nachhaltige Alternativen und Ergänzungen schaffen, können Teil der Bewerbung sein.</p>
+
+      <p>Wir wollen sehen, was bereits funktioniert. Was heute schon anders gemacht wird. Und was das Potenzial hat, Stralsunds Tourismus auch in Zukunft nachhaltig weiterzuentwickeln.</p>
+
+      <div class="article-callout">Kurz gesagt: Zeig uns, was du bereits tust, um Tourismus in Stralsund nachhaltiger und zukunftsfähiger zu gestalten.</div>
+
+      <h2>Wer kann mitmachen?</h2>
+
+      <p class="list-label">Der Wettbewerb richtet sich an:</p>
+      <ul class="article-list">
+        <li>Privatpersonen</li>
+        <li>Unternehmen</li>
+        <li>Verbände</li>
+        <li>Vereine</li>
+        <li>Initiativen</li>
+      </ul>
+
+      <p class="list-label">Dein Beitrag sollte:</p>
+      <ul class="article-list">
+        <li>bereits umgesetzt oder in der konkreten Umsetzung sein</li>
+        <li>einen erkennbaren Beitrag zum Schwerpunktthema „Nachhaltiger Tourismus" leisten</li>
+        <li>einen Mehrwert für Stralsund schaffen</li>
+        <li>Potenzial für eine langfristige Wirkung haben</li>
+        <li>einen Bezug zu den UN-Nachhaltigkeitszielen (SDGs) haben und</li>
+        <li>wirtschaftlich bzw. langfristig tragfähig sein</li>
+      </ul>
+
+      <h2>So bewirbst du dich</h2>
+
+      <p>Fülle einfach unser <a href="teilnehmen.html">Online-Formular</a> aus. Ergänzend kannst du in einer ausführlicheren PDF-Beschreibung zeigen, was du bereits umsetzt, welchen Beitrag du damit leistest und wie du den eingeschlagenen Weg weiterführen möchtest.</p>
+
+      <div class="apply-box">
+        <div class="apply-box-text">
+          <strong>Bewerbungszeitraum: 10. August bis 16. Oktober 2026</strong>
+          <span>Preisgeld: 2.000 €</span>
+        </div>
+        <a href="teilnehmen.html" class="btn btn-primary">Jetzt bewerben</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="brand"><span class="mark"></span>Zukunftspreis Stralsund</div>
+        <p class="footer-desc">Der Zukunftspreis Stralsund 2026 wird organisiert vom MakerPort Stralsund, der Hochschule Stralsund und der Hansestadt Stralsund.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Navigation</div>
+        <ul class="footer-links"><li><a href="teilnehmen.html">Bewerben</a></li><li><a href="details.html">Details</a></li></ul>
+      </div>
+      <div>
+        <div class="footer-heading">Rechtliches</div>
+        <ul class="footer-links"><li><a href="impressum.html">Impressum</a></li><li><a href="datenschutz.html">Datenschutzerklärung</a></li><li><a href="kontakt.html">Kontakt</a></li><li><a href="#" id="footerCookieLink">Cookie-Einstellungen</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Zukunftspreis Stralsund. Alle Rechte vorbehalten.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var burger = document.getElementById('burgerBtn');
+    var closeBtn = document.getElementById('menuCloseBtn');
+    var panel = document.getElementById('mobileMenu');
+    var backdrop = document.getElementById('menuBackdrop');
+
+    function openMenu(){
+      panel.classList.add('open');
+      backdrop.classList.add('open');
+      burger.setAttribute('aria-expanded','true');
+      document.body.style.overflow='hidden';
+      closeBtn.focus();
+    }
+    function closeMenu(){
+      panel.classList.remove('open');
+      backdrop.classList.remove('open');
+      burger.setAttribute('aria-expanded','false');
+      document.body.style.overflow='';
+      burger.focus();
+    }
+    burger.addEventListener('click', function(){
+      panel.classList.contains('open') ? closeMenu() : openMenu();
+    });
+    closeBtn.addEventListener('click', closeMenu);
+    backdrop.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && panel.classList.contains('open')) closeMenu();
+    });
+  })();
+</script>
+
+<!-- ===== Barrierefreiheits-Widget ===== -->
+<button class="a11y-toggle" id="a11yToggle" aria-label="Barrierefreiheits-Einstellungen öffnen" aria-expanded="false" aria-controls="a11yPanel">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="4.5" r="2" fill="currentColor"/><path d="M4 8.5c2.5 1 5.3 1.5 8 1.5s5.5-.5 8-1.5M12 10v11M12 15l-3.5 6M12 15l3.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<div class="a11y-panel" id="a11yPanel" role="dialog" aria-modal="false" aria-labelledby="a11yPanelTitle">
+  <button class="a11y-close" id="a11yClose" aria-label="Einstellungen schließen">&times;</button>
+  <h2 id="a11yPanelTitle">Barrierefreiheit</h2>
+  <p class="a11y-sub">Einstellungen werden lokal in Ihrem Browser gespeichert.</p>
+
+  <div class="a11y-row">
+    <span>Schriftgröße</span>
+    <div class="a11y-btnrow">
+      <button type="button" id="a11yFontMinus" aria-label="Schrift verkleinern">A−</button>
+      <button type="button" id="a11yFontPlus" aria-label="Schrift vergrößern">A+</button>
+    </div>
+  </div>
+  <div class="a11y-row">
+    <span>Starker Kontrast</span>
+    <button type="button" class="a11y-switch" id="a11yContrast" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Links unterstreichen</span>
+    <button type="button" class="a11y-switch" id="a11yUnderline" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Lesefreundlicher Abstand</span>
+    <button type="button" class="a11y-switch" id="a11yReadable" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Animationen reduzieren</span>
+    <button type="button" class="a11y-switch" id="a11yCalm" aria-pressed="false">An</button>
+  </div>
+  <div class="a11y-row">
+    <span>Großer Mauszeiger</span>
+    <button type="button" class="a11y-switch" id="a11yCursor" aria-pressed="false">An</button>
+  </div>
+
+  <button type="button" class="a11y-reset" id="a11yReset">Alle Einstellungen zurücksetzen</button>
+</div>
+
+<!-- ===== Cookie-Banner ===== -->
+<div class="cookie-banner" id="cookieBanner" role="region" aria-label="Cookie-Hinweis">
+  <div class="cookie-inner">
+    <p class="cookie-text">
+      Wir verwenden ausschließlich technisch notwendige Cookies bzw. lokale Speicherung
+      (u. a. für Ihre Cookie-Auswahl, Ihre Barrierefreiheits-Einstellungen sowie – im
+      passwortgeschützten Admin-Bereich – Ihre Anmeldesitzung). Es findet kein Tracking und
+      keine Analyse Ihres Verhaltens statt. Details in unserer
+      <a href="datenschutz.html">Datenschutzerklärung</a>.
+    </p>
+    <div class="cookie-actions">
+      <button type="button" class="cookie-necessary" id="cookieNecessary">Nur notwendige</button>
+      <button type="button" class="cookie-accept" id="cookieAccept">Verstanden</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ===== Barrierefreiheit =====
+  var root = document.documentElement;
+  var KEY = 'wfs_a11y';
+  var FS_KEY = 'wfs_a11y_fs';
+  var toggles = {
+    a11yContrast:'a11y-contrast',
+    a11yUnderline:'a11y-underline',
+    a11yReadable:'a11y-readable',
+    a11yCalm:'a11y-calm',
+    a11yCursor:'a11y-bigcursor'
+  };
+
+  function loadState(){
+    var raw;
+    try{ raw = JSON.parse(localStorage.getItem(KEY) || '{}'); }catch(e){ raw = {}; }
+    Object.keys(toggles).forEach(function(id){
+      var cls = toggles[id];
+      var on = !!raw[id];
+      root.classList.toggle(cls, on);
+      var btn = document.getElementById(id);
+      if(btn) btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var fs = parseInt(localStorage.getItem(FS_KEY) || '0', 10) || 0;
+    applyFontSize(fs);
+  }
+
+  function saveState(){
+    var raw = {};
+    Object.keys(toggles).forEach(function(id){
+      raw[id] = root.classList.contains(toggles[id]);
+    });
+    localStorage.setItem(KEY, JSON.stringify(raw));
+  }
+
+  function applyFontSize(step){
+    step = Math.max(0, Math.min(3, step));
+    for(var i=1;i<=3;i++){ root.classList.remove('a11y-fs-'+i); }
+    if(step > 0) root.classList.add('a11y-fs-'+step);
+    localStorage.setItem(FS_KEY, String(step));
+  }
+
+  loadState();
+
+  var panel = document.getElementById('a11yPanel');
+  var toggleBtn = document.getElementById('a11yToggle');
+  var closeBtn = document.getElementById('a11yClose');
+
+  function openPanel(){
+    panel.classList.add('open');
+    toggleBtn.setAttribute('aria-expanded','true');
+  }
+  function closePanel(){
+    panel.classList.remove('open');
+    toggleBtn.setAttribute('aria-expanded','false');
+  }
+  if(toggleBtn){
+    toggleBtn.addEventListener('click', function(){
+      panel.classList.contains('open') ? closePanel() : openPanel();
+    });
+  }
+  if(closeBtn) closeBtn.addEventListener('click', closePanel);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closePanel();
+  });
+  document.addEventListener('click', function(e){
+    if(panel && panel.classList.contains('open') && !panel.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)){
+      closePanel();
+    }
+  });
+
+  Object.keys(toggles).forEach(function(id){
+    var btn = document.getElementById(id);
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      var cls = toggles[id];
+      var on = !root.classList.contains(cls);
+      root.classList.toggle(cls, on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      saveState();
+    });
+  });
+
+  var fsMinus = document.getElementById('a11yFontMinus');
+  var fsPlus = document.getElementById('a11yFontPlus');
+  if(fsMinus) fsMinus.addEventListener('click', function(){
+    var cur = parseInt(localStorage.getItem(FS_KEY) || '0', 10) || 0;
+    applyFontSize(cur - 1);
+  });
+  if(fsPlus) fsPlus.addEventListener('click', function(){
+    var cur = parseInt(localStorage.getItem(FS_KEY) || '0', 10) || 0;
+    applyFontSize(cur + 1);
+  });
+
+  var resetBtn = document.getElementById('a11yReset');
+  if(resetBtn) resetBtn.addEventListener('click', function(){
+    Object.keys(toggles).forEach(function(id){
+      root.classList.remove(toggles[id]);
+      var btn = document.getElementById(id);
+      if(btn) btn.setAttribute('aria-pressed','false');
+    });
+    applyFontSize(0);
+    saveState();
+  });
+
+  // ===== Cookie-Banner =====
+  var CK = 'wfs_cookie_choice';
+  var banner = document.getElementById('cookieBanner');
+  var accept = document.getElementById('cookieAccept');
+  var necessary = document.getElementById('cookieNecessary');
+
+  function hasChoice(){
+    return !!localStorage.getItem(CK);
+  }
+  function setChoice(val){
+    localStorage.setItem(CK, val);
+    if(banner) banner.classList.remove('show');
+  }
+  if(banner && !hasChoice()){
+    banner.classList.add('show');
+  }
+  if(accept) accept.addEventListener('click', function(){ setChoice('all'); });
+  if(necessary) necessary.addEventListener('click', function(){ setChoice('necessary'); });
+
+  var footerCookieLink = document.getElementById('footerCookieLink');
+  if(footerCookieLink){
+    footerCookieLink.addEventListener('click', function(e){
+      e.preventDefault();
+      if(banner) banner.classList.add('show');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
