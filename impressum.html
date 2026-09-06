@@ -69,9 +69,12 @@
     backdrop-filter:blur(6px);
     border-bottom:1px solid var(--line);
   }
-  .nav{display:flex;align-items:center;justify-content:space-between;height:76px;}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:96px;}
   .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:18px;color:var(--ink);}
   .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:6px;flex:none;}
+  .brand-logo{height:64px;width:auto;display:block;}
+  .brand-logo-footer{height:64px;}
+  @media (max-width:640px){.brand-logo{height:44px;}}
   .nav-right{display:flex;align-items:center;gap:22px;}
   .burger{display:flex;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
   .burger span{width:22px;height:2px;background:var(--ink);display:block;transition:transform .2s ease,opacity .2s ease;}
@@ -166,7 +169,7 @@
   }
   @media (max-width:640px){
     .wrap{padding:0 22px;}
-    .nav{height:66px;}
+    .nav{height:72px;}
     .nav-right .btn-primary{display:none;}
     .page-head{padding:44px 0 32px;}
     .form-section{padding:44px 0 64px;}
@@ -342,8 +345,7 @@
 <header>
   <div class="wrap nav">
     <a href="index.html" class="brand">
-      <span class="mark"></span>
-      Zukunftspreis Stralsund
+      <img src="logo.png" alt="Zukunftspreis Stralsund" class="brand-logo">
     </a>
     <div class="nav-right">
       <a href="teilnehmen.html" class="btn btn-primary">Jetzt bewerben</a>
@@ -490,7 +492,7 @@
   <div class="wrap">
     <div class="footer-grid">
       <div>
-        <div class="brand"><span class="mark"></span>Zukunftspreis Stralsund</div>
+        <div class="brand"><img src="logo-white.png" alt="Zukunftspreis Stralsund" class="brand-logo brand-logo-footer"></div>
         <p class="footer-desc">Der Zukunftspreis Stralsund 2026 wird organisiert vom MakerPort Stralsund, der Hochschule Stralsund und der Hansestadt Stralsund.</p>
       </div>
       <div>
