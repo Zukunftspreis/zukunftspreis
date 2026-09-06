@@ -507,6 +507,26 @@
         return;
       }
 
+      // Echte Datei-Bytes serverseitig pruefen (Content-Type laesst sich faelschen,
+      // der tatsaechliche Dateiinhalt nicht). Laeuft NACH dem Upload, VOR dem
+      // Datenbank-Eintrag, damit bei ungueltiger Datei kein toter Eintrag entsteht.
+      try{
+        var { data: validation, error: validationError } = await supabase.functions.invoke('validate-application-pdf', {
+          body: { path: filePath }
+        });
+        if(validationError || !validation || !validation.valid){
+          alert('Die hochgeladene Datei ist keine gueltige PDF-Datei. Bitte lade eine echte PDF-Datei hoch.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Bewerben';
+          return;
+        }
+      }catch(e){
+        alert('Die Datei konnte nicht geprueft werden. Bitte versuche es erneut.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Bewerben';
+        return;
+      }
+
       var { error } = await supabase.from('bewerbungen').insert([{
         id: applicationId,
         beschreibung: data.beschreibung,
