@@ -554,6 +554,9 @@
     <button class="nav-btn" id="navContactBtn" data-target="contactPanel">
       Kontaktanfragen <span class="nav-count" id="navContactCount">0</span>
     </button>
+    <button class="nav-btn" id="navTerminBtn" data-target="terminePanel">
+      Terminabfrage <span class="nav-count" id="navTermineCount">0</span>
+    </button>
   </div>
 
   <section class="panel" id="overviewPanel">
@@ -661,6 +664,33 @@
     <div class="empty" id="contactEmpty" style="display:none;">Noch keine Kontaktanfragen.</div>
   </section>
 
+  <section class="panel collapsed" id="terminePanel">
+    <div class="panel-head">
+      <h2>Terminabfrage Jury-Meeting <span class="count" id="termineCount"></span></h2>
+      <div class="panel-head-actions">
+        <button id="exportTermineBtn" class="btn btn-outline btn-sm btn-export"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="btn-label-full">Als Excel exportieren</span><span class="btn-label-short">Excel</span></button>
+      </div>
+    </div>
+    <div style="padding:22px 24px;border-bottom:1px solid var(--line);background:var(--gray-bg);">
+      <h3 style="font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#5b6270;font-weight:800;margin-bottom:14px;">Wer kann wann? (Dauer ca. 1,5 Std.)</h3>
+      <div class="status-grid" id="termineSlotGrid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));"></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Kontakt</th>
+          <th>Verfügbare Termine</th>
+          <th>Anmerkung</th>
+          <th>Eingereicht am</th>
+          <th>Aktionen</th>
+        </tr>
+      </thead>
+      <tbody id="termineBody"></tbody>
+    </table>
+    <div class="empty" id="termineEmpty" style="display:none;">Noch keine Rückmeldungen.</div>
+  </section>
+
 </main>
 
 <!-- Modal: Kontaktanfrage im System beantworten -->
@@ -722,6 +752,18 @@
   function mapContactMessageFromDb(row){
     return { id: row.id, name: row.name, email: row.email, subject: row.subject, message: row.message, answered: row.answered, createdAt: row.created_at };
   }
+  function mapTerminFromDb(row){
+    return { id: row.id, name: row.name, email: row.email, slots: row.slots || [], kommentar: row.kommentar, createdAt: row.created_at };
+  }
+
+  const TERMIN_SLOTS = [
+    { key:'mo_11', label:'Mo 26.10.', sub:'11:00 Uhr' },
+    { key:'mo_14', label:'Mo 26.10.', sub:'14:00 Uhr' },
+    { key:'di_offen', label:'Di 27.10.', sub:'Uhrzeit offen' },
+    { key:'mi_9', label:'Mi 28.10.', sub:'9:00 Uhr' },
+    { key:'mi_13', label:'Mi 28.10.', sub:'13:00 Uhr' },
+  ];
+  const TERMIN_LABELS = Object.fromEntries(TERMIN_SLOTS.map(s => [s.key, s.label + ' · ' + s.sub]));
 
   async function fetchBewerbungen(){
     const { data, error } = await supabase.from('bewerbungen').select('*').order('created_at', { ascending:false });
@@ -733,6 +775,17 @@
     const { data, error } = await supabase.from('contact_messages').select('*').order('created_at', { ascending:false });
     if (error) { console.error(error); return []; }
     return data.map(mapContactMessageFromDb);
+  }
+
+  async function fetchTermine(){
+    const { data, error } = await supabase.from('jury_termine').select('*').order('created_at', { ascending:false });
+    if (error) { console.error(error); return []; }
+    return data.map(mapTerminFromDb);
+  }
+
+  async function deleteTermin(id){
+    const { error } = await supabase.from('jury_termine').delete().eq('id', id);
+    if (error) throw new Error(error.message);
   }
 
   async function updateBewerbungStatus(id, newStatus){
@@ -798,15 +851,18 @@
 
   let currentBewerbungen = [];
   let currentContactMessages = [];
+  let currentTermine = [];
   let bewerbungenSearchTerm = '';
   let contactSearchTerm = '';
 
   async function loadAll(){
-    const [blist, cmlist] = await Promise.all([ fetchBewerbungen(), fetchContactMessages() ]);
+    const [blist, cmlist, tlist] = await Promise.all([ fetchBewerbungen(), fetchContactMessages(), fetchTermine() ]);
     currentBewerbungen = blist;
     currentContactMessages = cmlist;
+    currentTermine = tlist;
     renderBewerbungen();
     renderContactMessages();
+    renderTermine();
     renderOverviewStats();
     renderStatusBreakdown();
     renderLatestBewerbungen();
@@ -953,6 +1009,53 @@
     `).join('');
   }
 
+  function renderTermine(){
+    document.getElementById('termineCount').textContent = '(' + currentTermine.length + ')';
+    document.getElementById('navTermineCount').textContent = currentTermine.length;
+
+    // Auswertung: wie viele Personen koennen pro Termin
+    const grid = document.getElementById('termineSlotGrid');
+    grid.innerHTML = TERMIN_SLOTS.map(slot => {
+      const count = currentTermine.filter(t => t.slots.includes(slot.key)).length;
+      return `
+        <div class="status-tile neu">
+          <div class="status-tile-value">${count}</div>
+          <div class="status-tile-label">${esc(slot.label)}<br>${esc(slot.sub)}</div>
+        </div>
+      `;
+    }).join('');
+
+    const body = document.getElementById('termineBody');
+    const empty = document.getElementById('termineEmpty');
+
+    if(!currentTermine.length){
+      body.innerHTML='';
+      empty.style.display='block';
+      return;
+    }
+    empty.style.display='none';
+    body.innerHTML = currentTermine.map(t => `
+      <tr>
+        <td data-label="Name"><div class="name-cell">${esc(t.name)}</div></td>
+        <td data-label="Kontakt">${t.email ? esc(t.email) : '<span class="sub">–</span>'}</td>
+        <td data-label="Verfügbare Termine">
+          <div style="display:flex;flex-wrap:wrap;gap:5px;max-width:280px;">
+            ${t.slots.map(s => `<span class="badge status-angenommen" style="white-space:nowrap;">${esc(TERMIN_LABELS[s] || s)}</span>`).join('')}
+          </div>
+        </td>
+        <td data-label="Anmerkung">
+          ${t.kommentar ? '<div style="max-width:220px;white-space:normal;">' + esc(t.kommentar) + '</div>' : '<span class="sub">–</span>'}
+        </td>
+        <td data-label="Eingereicht am">${new Date(t.createdAt).toLocaleString('de-DE')}</td>
+        <td data-label="Aktionen">
+          <div class="actions-cell">
+            <button class="btn btn-sm btn-outline" data-deltermin="${t.id}">Entfernen</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
   document.getElementById('bewerbungenSearch').addEventListener('input', (e) => {
     bewerbungenSearchTerm = e.target.value;
     renderBewerbungen();
@@ -1014,10 +1117,21 @@
     exportToExcel(rows, 'kontaktanfragen.xlsx', 'Kontaktanfragen');
   });
 
+  document.getElementById('exportTermineBtn').addEventListener('click', () => {
+    const rows = currentTermine.map(t => ({
+      'Name': t.name, 'E-Mail': t.email || '',
+      'Verfügbare Termine': t.slots.map(s => TERMIN_LABELS[s] || s).join(', '),
+      'Anmerkung': t.kommentar || '',
+      'Eingereicht am': new Date(t.createdAt).toLocaleString('de-DE')
+    }));
+    exportToExcel(rows, 'terminabfrage.xlsx', 'Terminabfrage');
+  });
+
   document.addEventListener('click', async (e) => {
     const viewPdfId = e.target.getAttribute('data-viewpdf');
     const delBewerbungId = e.target.getAttribute('data-delbewerbung');
     const delContactId = e.target.getAttribute('data-delcontact');
+    const delTerminId = e.target.getAttribute('data-deltermin');
     const replyId = e.target.getAttribute('data-reply');
 
     try{
@@ -1036,6 +1150,12 @@
       if(delContactId){
         if(confirm('Diese Kontaktanfrage entfernen?')){
           await deleteContactMessage(delContactId);
+          loadAll();
+        }
+      }
+      if(delTerminId){
+        if(confirm('Diese Rückmeldung entfernen?')){
+          await deleteTermin(delTerminId);
           loadAll();
         }
       }
@@ -1242,6 +1362,10 @@
   <button class="mnav-item" data-target="contactPanel" aria-label="Kontaktanfragen">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>Kontakt</span>
+  </button>
+  <button class="mnav-item" data-target="terminePanel" aria-label="Terminabfrage">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Termine</span>
   </button>
 </nav>
 
