@@ -548,7 +548,7 @@
         successBox.classList.add('show');
         return;
       }
-      if(Date.now() - formRenderedAt < 3000){
+      if(Date.now() - formRenderedAt < 1000){
         errorBox.style.display = 'block';
         return;
       }
